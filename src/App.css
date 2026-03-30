@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* THEME VARIABLES */
+:root {
+  --sidebar-width: 250px;
+  --sidebar-collapsed-width: 60px;
+  --primary: #6c63ff;
+  --primary-light: #ede9ff;
+  
+  /* Light Mode Colors */
+  --bg: #f7f7f8;
+  --white: #ffffff;
+  --text: #1a1a2e;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+
+/* DARK MODE OVERRIDES */
+body.dark-mode {
+  --bg: #121212;
+  --white: #1e1e1e;
+  --text: #f5f5f5;
+  --text-muted: #a0a0a0;
+  --border: #333333;
+  --primary-light: #2d2b55;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  margin-left: var(--sidebar-width);
+  transition: margin-left 0.3s ease;
+  height: 100vh;
+}
+
+.main-content.sidebar-collapsed {
+  margin-left: var(--sidebar-collapsed-width);
+}
+
+/* ============================================================
+   FORCE VISIBILITY FIX
+   Ensures buttons never hide unless hovered
+   ============================================================ */
+[class*="btn-"], 
+.subject-card-actions, 
+.topic-actions, 
+.unit-actions {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: flex !important;
+  transform: none !important;
+}
+
+[class*="btn-"]:hover {
+  transform: translateY(-1px) !important;
+  cursor: pointer !important;
+}
+
+/* Ensure consistent button text color in dark mode */
+body.dark-mode .btn-secondary {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+}
