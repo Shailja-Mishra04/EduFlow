@@ -1,68 +1,111 @@
-import React, { useState, useRef } from 'react';
-import Draggable from 'react-draggable';
+import React, { useState, useEffect, useRef } from 'react';
 import './TodoList.css';
 
-function TodoList() {
-  const [tasks, setTasks] = useState([]);
+const TodoList = () => {
+  const [visible, setVisible] = useState(false);
+  const [tasks, setTasks] = useState(() => {
+    const saved = localStorage.getItem('eduflow-todos');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [input, setInput] = useState('');
-  const [minimized, setMinimized] = useState(false);
+  const [position, setPosition] = useState({ x: window.innerWidth - 340, y: 200 });
+  const dragging = useRef(false);
+  const offset = useRef({ x: 0, y: 0 });
+  const widgetRef = useRef(null);
 
-  const nodeRef = useRef(null);
+  useEffect(() => {
+    localStorage.setItem('eduflow-todos', JSON.stringify(tasks));
+  }, [tasks]);
+
+  const onMouseDown = (e) => {
+    dragging.current = true;
+    offset.current = {
+      x: e.clientX - position.x,
+      y: e.clientY - position.y,
+    };
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  };
+
+  const onMouseMove = (e) => {
+    if (!dragging.current) return;
+    setPosition({
+      x: e.clientX - offset.current.x,
+      y: e.clientY - offset.current.y,
+    });
+  };
+
+  const onMouseUp = () => {
+    dragging.current = false;
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
 
   const addTask = () => {
-    if (input.trim() === '') return;
-    setTasks([...tasks, input]);
+    if (!input.trim()) return;
+    setTasks([...tasks, { id: Date.now(), text: input.trim(), done: false }]);
     setInput('');
   };
 
-  const deleteTask = (index) => {
-    const newTasks = tasks.filter((_, i) => i !== index);
-    setTasks(newTasks);
+  const toggleTask = (id) => {
+    setTasks(tasks.map(t => t.id === id ? { ...t, done: !t.done } : t));
   };
 
-  return (
-    <Draggable
-      handle=".todo-header"
-      nodeRef={nodeRef}
-      cancel="button, input"
-    >
-      <div className="todo-container" ref={nodeRef}>
-        
-        {/* HEADER (drag handle) */}
-        <div className="todo-header">
-          <span>📝 To-Do</span>
-          <button onClick={() => setMinimized(!minimized)}>
-            {minimized ? '⬆' : '⬇'}
-          </button>
-        </div>
+  const deleteTask = (id) => {
+    setTasks(tasks.filter(t => t.id !== id));
+  };
 
-        {/* CONTENT (hidden when minimized) */}
-        {!minimized && (
-          <>
-            <div className="todo-input">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Add task..."
-              />
-              <button onClick={addTask}>Add</button>
-            </div>
-
-            <ul className="todo-list">
-              {tasks.map((task, index) => (
-                <li key={index}>
-                  <span>{task}</span>
-                  <button onClick={() => deleteTask(index)}>❌</button>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-
+  if (!visible) {
+    return (
+      <div
+        className="todo-float"
+        style={{ left: position.x, top: position.y }}
+        onClick={() => setVisible(true)}
+      >
+        <span>📝</span>
+        <span className="todo-float-count">{tasks.filter(t => !t.done).length}</span>
       </div>
-    </Draggable>
+    );
+  }
+
+  return (
+    <div
+      className="todo-widget"
+      ref={widgetRef}
+      style={{ left: position.x, top: position.y }}
+    >
+      <div className="todo-header" onMouseDown={onMouseDown}>
+        <span className="todo-title">📝 To-Do</span>
+        <button className="todo-close" onClick={() => setVisible(false)}>−</button>
+      </div>
+      <div className="todo-input-row">
+        <input
+          className="todo-input"
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && addTask()}
+          placeholder="Add a task..."
+        />
+        <button className="todo-add-btn" onClick={addTask}>+</button>
+      </div>
+      <div className="todo-list">
+        {tasks.length === 0 && (
+          <p className="todo-empty">No tasks yet. Add one above!</p>
+        )}
+        {tasks.map(task => (
+          <div key={task.id} className={`todo-item ${task.done ? 'done' : ''}`}>
+            <input
+              type="checkbox"
+              checked={task.done}
+              onChange={() => toggleTask(task.id)}
+            />
+            <span className="todo-text">{task.text}</span>
+            <button className="todo-delete" onClick={() => deleteTask(task.id)}>×</button>
+          </div>
+        ))}
+      </div>
+    </div>
   );
-}
+};
 
 export default TodoList;

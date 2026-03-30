@@ -1,74 +1,99 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Timer.css';
 
-function Timer() {
-  const [seconds, setSeconds] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
-  const [collapsed, setCollapsed] = useState(true);
+const MODES = {
+  pomodoro: 25 * 60,
+  short: 5 * 60,
+  long: 15 * 60,
+};
 
-  // Timer logic
+const Timer = () => {
+  const [mode, setMode] = useState('pomodoro');
+  const [timeLeft, setTimeLeft] = useState(MODES.pomodoro);
+  const [running, setRunning] = useState(false);
+  const [minimized, setMinimized] = useState(true);
+  const intervalRef = useRef(null);
+
   useEffect(() => {
-    let interval = null;
-
-    if (isRunning) {
-      interval = setInterval(() => {
-        setSeconds(prev => prev + 1);
+    if (running) {
+      intervalRef.current = setInterval(() => {
+        setTimeLeft(t => {
+          if (t <= 1) {
+            clearInterval(intervalRef.current);
+            setRunning(false);
+            return 0;
+          }
+          return t - 1;
+        });
       }, 1000);
+    } else {
+      clearInterval(intervalRef.current);
     }
+    return () => clearInterval(intervalRef.current);
+  }, [running]);
 
-    return () => clearInterval(interval);
-  }, [isRunning]);
-
-  // Format time (HH:MM:SS)
-  const formatTime = () => {
-    const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
-    const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-    const secs = String(seconds % 60).padStart(2, '0');
-    return `${hrs}:${mins}:${secs}`;
+  const switchMode = (m) => {
+    setMode(m);
+    setTimeLeft(MODES[m]);
+    setRunning(false);
   };
 
+  const reset = () => {
+    setTimeLeft(MODES[mode]);
+    setRunning(false);
+  };
+
+  const fmt = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+
+  const progress = ((MODES[mode] - timeLeft) / MODES[mode]) * 100;
+
+  if (minimized) {
+    return (
+      <div className="timer-float" onClick={() => setMinimized(false)}>
+        <span className="timer-float-icon">⏱</span>
+        <span className="timer-float-time">{fmt(timeLeft)}</span>
+        {running && <span className="timer-float-dot" />}
+      </div>
+    );
+  }
+
   return (
-    <div className={`timer ${collapsed ? 'collapsed' : ''}`}>
-
-      {/* Collapsed button */}
-      {collapsed && (
-        <button
-          className="timer-toggle-btn"
-          onClick={() => setCollapsed(false)}
-        >
-          ⏱
+    <div className="timer-expanded">
+      <div className="timer-header">
+        <span className="timer-title">Focus Timer</span>
+        <button className="timer-minimize" onClick={() => setMinimized(true)}>−</button>
+      </div>
+      <div className="timer-modes">
+        {Object.keys(MODES).map(m => (
+          <button
+            key={m}
+            className={`timer-mode-btn ${mode === m ? 'active' : ''}`}
+            onClick={() => switchMode(m)}
+          >
+            {m === 'pomodoro' ? 'Focus' : m === 'short' ? 'Short Break' : 'Long Break'}
+          </button>
+        ))}
+      </div>
+      <div className="timer-circle-wrap">
+        <svg className="timer-ring" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="54" className="timer-ring-bg" />
+          <circle
+            cx="60" cy="60" r="54"
+            className="timer-ring-progress"
+            strokeDasharray={`${2 * Math.PI * 54}`}
+            strokeDashoffset={`${2 * Math.PI * 54 * (1 - progress / 100)}`}
+          />
+        </svg>
+        <span className="timer-display">{fmt(timeLeft)}</span>
+      </div>
+      <div className="timer-controls">
+        <button className="timer-btn reset" onClick={reset}>↺</button>
+        <button className="timer-btn play" onClick={() => setRunning(!running)}>
+          {running ? '⏸' : '▶'}
         </button>
-      )}
-
-      {/* Expanded Timer */}
-      {!collapsed && (
-        <div className="timer-panel">
-
-          <div className="timer-header">
-            <span>Study Timer</span>
-            <button onClick={() => setCollapsed(true)}>—</button>
-          </div>
-
-          <div className="timer-display">
-            {formatTime()}
-          </div>
-
-          <div className="timer-controls">
-            <button onClick={() => setIsRunning(true)}>Start</button>
-            <button onClick={() => setIsRunning(false)}>Pause</button>
-            <button onClick={() => {
-              setIsRunning(false);
-              setSeconds(0);
-            }}>
-              Reset
-            </button>
-          </div>
-
-        </div>
-      )}
-
+      </div>
     </div>
   );
-}
+};
 
 export default Timer;

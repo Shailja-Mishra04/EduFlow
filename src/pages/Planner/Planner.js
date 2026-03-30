@@ -1,99 +1,236 @@
-import React, { useState } from "react";
-import "./Planner.css";
+import React, { useState, useEffect } from 'react';
+import './Planner.css';
 
-function Planner() {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [notes, setNotes] = useState({});
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [input, setInput] = useState("");
+const MONTHS = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
+const Planner = () => {
+  const [events, setEvents] = useState(() => {
+    const saved = localStorage.getItem('eduflow-events');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const today = new Date();
+  const [current, setCurrent] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+  const [selected, setSelected] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [newEvent, setNewEvent] = useState({ title: '', date: '', type: 'study', notes: '' });
 
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  useEffect(() => {
+    localStorage.setItem('eduflow-events', JSON.stringify(events));
+  }, [events]);
+
+  const year = current.getFullYear();
+  const month = current.getMonth();
   const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrev = new Date(year, month, 0).getDate();
 
-  const changeMonth = (dir) => {
-    setCurrentDate(new Date(year, month + dir, 1));
-  };
+  const cells = [];
+  for (let i = firstDay - 1; i >= 0; i--) {
+    cells.push({ day: daysInPrev - i, current: false });
+  }
+  for (let i = 1; i <= daysInMonth; i++) {
+    cells.push({ day: i, current: true });
+  }
+  while (cells.length % 7 !== 0) {
+    cells.push({ day: cells.length - daysInMonth - firstDay + 1, current: false });
+  }
 
-  const handleAddNote = () => {
-    if (!input) return;
-
-    setNotes({
-      ...notes,
-      [selectedDate]: [...(notes[selectedDate] || []), input],
+  const getEventsForDay = (day) => {
+    if (!day.current) return [];
+    return events.filter(e => {
+      const d = new Date(e.date);
+      return d.getDate() === day.day && d.getMonth() === month && d.getFullYear() === year;
     });
-
-    setInput("");
   };
 
-  const getDateKey = (day) => {
-    return `${year}-${month + 1}-${day}`;
+  const isToday = (day) =>
+    day.current &&
+    day.day === today.getDate() &&
+    month === today.getMonth() &&
+    year === today.getFullYear();
+
+  const addEvent = () => {
+    if (!newEvent.title.trim() || !newEvent.date) return;
+    setEvents([...events, { id: Date.now(), ...newEvent }]);
+    setNewEvent({ title: '', date: '', type: 'study', notes: '' });
+    setShowForm(false);
   };
+
+  const deleteEvent = (id) => {
+    setEvents(events.filter(e => e.id !== id));
+  };
+
+  const selectedEvents = selected
+    ? events.filter(e => {
+        const d = new Date(e.date);
+        return (
+          d.getDate() === selected.day &&
+          d.getMonth() === month &&
+          d.getFullYear() === year
+        );
+      })
+    : [];
+
+  const upcomingEvents = events
+    .filter(e => new Date(e.date) >= today)
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+    .slice(0, 6);
 
   return (
-    <div className="calendar-container">
-
-      {/* Header */}
-      <div className="calendar-header">
-        <button onClick={() => changeMonth(-1)}>⬅</button>
-        <h2>
-          {currentDate.toLocaleString("default", { month: "long" })} {year}
-        </h2>
-        <button onClick={() => changeMonth(1)}>➡</button>
+    <div className="planner-page">
+      <div className="planner-header">
+        <div>
+          <h1>📅 Planner</h1>
+          <p>Track your exams, deadlines and study sessions</p>
+        </div>
+        <button className="btn-primary" onClick={() => setShowForm(true)}>
+          + Add Event
+        </button>
       </div>
 
-      {/* Grid */}
-      <div className="calendar-grid">
+      <div className="planner-layout">
+        {/* Calendar */}
+        <div className="planner-calendar">
+          <div className="cal-nav-header">
+            <button className="cal-nav-btn" onClick={() => setCurrent(new Date(year, month - 1, 1))}>‹</button>
+            <h2>{MONTHS[month]} {year}</h2>
+            <button className="cal-nav-btn" onClick={() => setCurrent(new Date(year, month + 1, 1))}>›</button>
+          </div>
 
-        {/* Empty spaces before month starts */}
-        {Array.from({ length: firstDay }).map((_, i) => (
-          <div key={"empty" + i}></div>
-        ))}
-
-        {/* Days */}
-        {Array.from({ length: daysInMonth }, (_, i) => {
-          const day = i + 1;
-          const key = getDateKey(day);
-
-          return (
-            <div
-              key={day}
-              className="calendar-day"
-              onClick={() => setSelectedDate(key)}
-            >
-              <div className="day-number">{day}</div>
-
-              {(notes[key] || []).map((n, idx) => (
-                <div key={idx} className="note">
-                  {n}
+          <div className="cal-grid-full">
+            {DAYS.map(d => (
+              <div key={d} className="cal-day-name">{d}</div>
+            ))}
+            {cells.map((cell, i) => {
+              const dayEvents = getEventsForDay(cell);
+              const isSelected = selected && selected.day === cell.day && cell.current;
+              return (
+                <div
+                  key={i}
+                  className={`cal-cell ${!cell.current ? 'other-month' : ''} ${isToday(cell) ? 'today' : ''} ${isSelected ? 'selected' : ''}`}
+                  onClick={() => cell.current && setSelected(cell)}
+                >
+                  <span className="cal-cell-num">{cell.day}</span>
+                  <div className="cal-cell-events">
+                    {dayEvents.slice(0, 2).map(e => (
+                      <div key={e.id} className={`cal-event-dot ${e.type}`}>
+                        {e.title}
+                      </div>
+                    ))}
+                    {dayEvents.length > 2 && (
+                      <div className="cal-event-more">+{dayEvents.length - 2}</div>
+                    )}
+                  </div>
                 </div>
-              ))}
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Right panel */}
+        <div className="planner-right">
+          {/* Selected day events */}
+          {selected && (
+            <div className="day-detail">
+              <h3>{MONTHS[month]} {selected.day}, {year}</h3>
+              {selectedEvents.length === 0 ? (
+                <p className="no-events">No events this day</p>
+              ) : (
+                selectedEvents.map(e => (
+                  <div key={e.id} className={`event-card ${e.type}`}>
+                    <div className="event-card-top">
+                      <span className="event-title">{e.title}</span>
+                      <button className="event-delete" onClick={() => deleteEvent(e.id)}>×</button>
+                    </div>
+                    {e.notes && <p className="event-notes">{e.notes}</p>}
+                    <span className={`event-type-tag ${e.type}`}>{e.type}</span>
+                  </div>
+                ))
+              )}
             </div>
-          );
-        })}
+          )}
+
+          {/* Upcoming events */}
+          <div className="upcoming-section">
+            <h3>Upcoming Events</h3>
+            {upcomingEvents.length === 0 ? (
+              <p className="no-events">No upcoming events</p>
+            ) : (
+              upcomingEvents.map(e => {
+                const d = new Date(e.date);
+                return (
+                  <div key={e.id} className="upcoming-event-row">
+                    <div className={`upcoming-badge ${e.type}`}>
+                      <span>{d.getDate()}</span>
+                      <span>{MONTHS[d.getMonth()].slice(0, 3)}</span>
+                    </div>
+                    <div className="upcoming-event-info">
+                      <span className="upcoming-event-title">{e.title}</span>
+                      <span className={`event-type-tag ${e.type}`}>{e.type}</span>
+                    </div>
+                    <button className="event-delete" onClick={() => deleteEvent(e.id)}>×</button>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Modal */}
-      {selectedDate && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3>{selectedDate}</h3>
-
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Add task (e.g. Physics exam)"
-            />
-
-            <button onClick={handleAddNote}>Add</button>
-            <button onClick={() => setSelectedDate(null)}>Close</button>
+      {/* Add Event Modal */}
+      {showForm && (
+        <div className="modal-overlay" onClick={() => setShowForm(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h2>Add New Event</h2>
+            <div className="modal-field">
+              <label>Title</label>
+              <input
+                placeholder="e.g. Math Exam"
+                value={newEvent.title}
+                onChange={e => setNewEvent({ ...newEvent, title: e.target.value })}
+                autoFocus
+              />
+            </div>
+            <div className="modal-field">
+              <label>Date</label>
+              <input
+                type="date"
+                value={newEvent.date}
+                onChange={e => setNewEvent({ ...newEvent, date: e.target.value })}
+              />
+            </div>
+            <div className="modal-field">
+              <label>Type</label>
+              <select
+                className="subject-select"
+                style={{ width: '100%', padding: '10px 12px' }}
+                value={newEvent.type}
+                onChange={e => setNewEvent({ ...newEvent, type: e.target.value })}
+              >
+                <option value="exam">📝 Exam</option>
+                <option value="deadline">⏰ Deadline</option>
+                <option value="study">📚 Study Session</option>
+              </select>
+            </div>
+            <div className="modal-field">
+              <label>Notes (optional)</label>
+              <input
+                placeholder="Any additional notes..."
+                value={newEvent.notes}
+                onChange={e => setNewEvent({ ...newEvent, notes: e.target.value })}
+              />
+            </div>
+            <div className="modal-actions">
+              <button className="btn-secondary" onClick={() => setShowForm(false)}>Cancel</button>
+              <button className="btn-primary" onClick={addEvent}>Add Event</button>
+            </div>
           </div>
         </div>
       )}
     </div>
   );
-}
+};
 
 export default Planner;

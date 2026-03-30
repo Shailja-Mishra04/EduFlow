@@ -1,74 +1,406 @@
-.calendar-header {
+.planner-page {
+  padding: 32px 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.planner-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 32px;
 }
 
-.calendar-header button {
-  padding: 6px 10px;
+.planner-header h1 {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.planner-header p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-}
-.calendar-container {
-  padding: 20px;
+  transition: background 0.2s;
+  font-family: 'Inter', sans-serif;
 }
 
-.calendar-grid {
+.btn-primary:hover { background: #5a52d5; }
+
+.btn-secondary {
+  background: none;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+.btn-secondary:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.planner-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+  align-items: start;
+}
+
+.planner-calendar {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+
+.cal-nav-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.cal-nav-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.cal-nav-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cal-nav-btn:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.cal-grid-full {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
+  gap: 4px;
 }
 
-.calendar-day {
-  height: 120px;
-  border: 1px solid #ccc;
-  padding: 5px;
+.cal-day-name {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 8px 0;
+}
+
+.cal-cell {
+  min-height: 80px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px;
   cursor: pointer;
-  background: #fafafa;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.cal-cell:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.cal-cell.other-month {
+  background: var(--bg);
+  cursor: default;
+}
+
+.cal-cell.other-month .cal-cell-num {
+  color: var(--border);
+}
+
+.cal-cell.today {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.cal-cell.today .cal-cell-num {
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.cal-cell.selected {
+  border-color: var(--primary);
+  background: #ddd6fe;
+}
+
+.cal-cell-num {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.cal-cell-events {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
-.calendar-day:hover {
-  background: #f0f0f0;
-}
-
-.day-number {
-  font-weight: bold;
-}
-
-.day-notes {
-  margin-top: 5px;
+.cal-event-dot {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
 }
 
-.note {
+.cal-event-dot.exam { background: #fee2e2; color: #ef4444; }
+.cal-event-dot.deadline { background: #fef3c7; color: #d97706; }
+.cal-event-dot.study { background: #dcfce7; color: #16a34a; }
+
+.cal-event-more {
+  font-size: 10px;
+  color: var(--text-muted);
+  padding: 0 4px;
+}
+
+/* Right panel */
+.planner-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.day-detail {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.day-detail h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.no-events {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 16px 0;
+}
+
+.event-card {
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+}
+
+.event-card.exam { background: #fee2e2; border-color: #fca5a5; }
+.event-card.deadline { background: #fef3c7; border-color: #fcd34d; }
+.event-card.study { background: #dcfce7; border-color: #86efac; }
+
+.event-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.event-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.event-delete {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.event-delete:hover { color: #ef4444; }
+
+.event-notes {
   font-size: 12px;
-  background: #dfefff;
-  margin-bottom: 3px;
-  padding: 2px;
-  border-radius: 3px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.event-type-tag {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 50px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.event-type-tag.exam { background: #fee2e2; color: #ef4444; }
+.event-type-tag.deadline { background: #fef3c7; color: #d97706; }
+.event-type-tag.study { background: #dcfce7; color: #16a34a; }
+
+.upcoming-section {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.upcoming-section h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.upcoming-event-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.upcoming-event-row:last-child {
+  border-bottom: none;
+}
+
+.upcoming-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.upcoming-badge.exam { background: #ef4444; }
+.upcoming-badge.deadline { background: #f59e0b; }
+.upcoming-badge.study { background: #22c55e; }
+
+.upcoming-event-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.upcoming-event-title {
+  font-size: 13px;
+  font-weight: 600;
 }
 
 /* Modal */
-.modal {
+.modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background: rgba(0,0,0,0.3);
-
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(2px);
 }
 
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
+.modal {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 32px;
+  width: 420px;
+  box-shadow: var(--shadow-md);
+}
+
+.modal h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.modal-field {
+  margin-bottom: 16px;
+}
+
+.modal-field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.modal-field input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 14px;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+}
+
+.modal-field input:focus {
+  border-color: var(--primary);
+}
+
+.modal-actions {
   display: flex;
-  flex-direction: column;
+  justify-content: flex-end;
   gap: 10px;
+  margin-top: 24px;
+}
+
+.subject-select {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  background: var(--white);
+  cursor: pointer;
 }
