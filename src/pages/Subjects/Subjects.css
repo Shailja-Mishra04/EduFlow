@@ -1,0 +1,45 @@
+.subjects-container {
+  padding: 30px;
+}
+
+.subjects-container h2 {
+  margin-bottom: 20px;
+}
+
+/* Input */
+.subject-input {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.subject-input input {
+  padding: 8px;
+  flex: 1;
+}
+
+.subject-input button {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+/* Grid */
+.subject-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+/* Card */
+.subject-card {
+  padding: 20px;
+  background: #f5f5f5;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: 0.2s;
+}
+
+.subject-card:hover {
+  background: #e0e0e0;
+}
