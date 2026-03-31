@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Flashcards.css';
+import { Layers, Play, Plus } from 'lucide-react';
 
 const Flashcards = () => {
   const [flashcards, setFlashcards] = useState(() => {
@@ -104,7 +105,7 @@ const Flashcards = () => {
     <div className="flashcards-page">
       <div className="flashcards-header">
         <div>
-          <h1>🃏 Flashcards</h1>
+          <h1><Layers className="page-icon" /> Flashcards</h1>
           <p>Create and study your flashcards</p>
         </div>
 
@@ -114,11 +115,11 @@ const Flashcards = () => {
             onClick={startStudy}
             disabled={filtered.length === 0}
           >
-            ▶ Study Mode
+            <Play size={16} style={{ marginRight: '6px' }} /> Study Mode
           </button>
 
           <button className="btn-primary" onClick={() => setShowForm(true)}>
-            + New Card
+            <Plus size={18} /> New Card
           </button>
         </div>
       </div>
@@ -205,7 +206,7 @@ const Flashcards = () => {
       {/* Empty */}
       {filtered.length === 0 && (
         <div className="flashcards-empty">
-          <div className="empty-icon">🃏</div>
+          <div className="empty-icon"><Layers size={48} color="#ccc" /></div>
           <h2>No flashcards yet</h2>
           <p>Create your first flashcard to start studying</p>
         </div>

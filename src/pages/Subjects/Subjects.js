@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Subjects.css';
+import { BookOpen } from 'lucide-react';
 
 const EMOJIS = ['📚','📖','✏️','🔬','🧪','🧬','🔭','🌍','📐','📏','🧮','💻','🎨','🎵','🏛️','⚗️','🧲','📊','📈','🗺️'];
 const COLORS = ['#ede9ff','#dbeafe','#dcfce7','#fef3c7','#fee2e2','#fce7f3','#e0f2fe','#f0fdf4'];
@@ -118,7 +119,7 @@ const Subjects = () => {
       {/* Header */}
       <div className="subjects-header">
         <div>
-          <h1>📚 My Subjects</h1>
+          <h1><BookOpen className="page-icon" /> My Subjects</h1>
           <p>Organize your studies by subject, unit, and topic</p>
         </div>
         <button

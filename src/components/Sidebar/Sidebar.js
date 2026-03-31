@@ -1,13 +1,23 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import {
+  LayoutDashboard,
+  BookOpen,
+  CalendarDays,
+  Layers,
+  Sun,
+  Moon,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import './Sidebar.css';
 
 const Sidebar = ({ collapsed, onToggle, darkMode, onToggleDarkMode }) => {
   const navItems = [
-    { path: '/dashboard', icon: '🏠', label: 'Dashboard' },
-    { path: '/subjects', icon: '📚', label: 'Subjects' },
-    { path: '/planner', icon: '📅', label: 'Planner' },
-    { path: '/flashcards', icon: '🃏', label: 'Flashcards' },
+    { path: '/dashboard', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
+    { path: '/subjects',  icon: <BookOpen size={20} />,        label: 'Subjects'   },
+    { path: '/planner',   icon: <CalendarDays size={20} />,    label: 'Planner'    },
+    { path: '/flashcards',icon: <Layers size={20} />,          label: 'Flashcards' },
   ];
 
   return (
@@ -15,7 +25,7 @@ const Sidebar = ({ collapsed, onToggle, darkMode, onToggleDarkMode }) => {
       <div className="sidebar-header">
         {!collapsed && <span className="sidebar-logo">EduFlow</span>}
         <button className="toggle-btn" onClick={onToggle} aria-label="Toggle Sidebar">
-          {collapsed ? '→' : '←'}
+          {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
         </button>
       </div>
 
@@ -33,21 +43,21 @@ const Sidebar = ({ collapsed, onToggle, darkMode, onToggleDarkMode }) => {
       </nav>
 
       <div className="sidebar-footer">
-        {/* Dark Mode Toggle Button */}
-        <button 
-          className="theme-toggle-btn" 
+        {/* Dark Mode Toggle */}
+        <button
+          className="theme-toggle-btn"
           onClick={onToggleDarkMode}
-          title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         >
-          <span className="nav-icon">{darkMode ? '☀️' : '🌙'}</span>
-          {!collapsed && <span className="nav-label">{darkMode ? 'Light Mode' : 'Dark Mode'}</span>}
+          <span className="nav-icon">
+            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+          </span>
+          {!collapsed && (
+            <span className="nav-label">{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
+          )}
         </button>
 
-        {/* Settings Item */}
-        <div className="nav-item">
-          <span className="nav-icon">⚙️</span>
-          {!collapsed && <span className="nav-label">Settings</span>}
-        </div>
+
       </div>
     </aside>
   );

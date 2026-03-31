@@ -1,0 +1,117 @@
+/* ============================================================
+   SPLASH  –  Premium Black gradient, overlapping full-page waves
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
+
+/* ── Base overlay ── */
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Premium deep black background (nearly OLED black) */
+  background: #020203;
+  transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.splash--show { opacity: 1; }
+.splash--fade { opacity: 0; pointer-events: none; }
+
+/* ============================================================
+   WAVE CONTAINER  –  Covering the whole page
+   ============================================================ */
+.overlapping-waves {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 1;
+  /* Very subtle pulse for a premium feel (no extreme brightening!) */
+  animation: premiumPulse 2.6s ease forwards;
+}
+
+@keyframes premiumPulse {
+  0%   { opacity: 0; }
+  20%  { opacity: 0.8; }
+  80%  { opacity: 1; }
+  100% { opacity: 1.1; } /* slight CSS trick for safety */
+}
+
+/* ── Overlapping Wave Layers ── */
+.wave-layer {
+  position: absolute;
+  bottom: -5px; 
+  width: 200%;  
+  /* All waves glide slowly in perfect sync */
+  animation: waveSlide 18s linear infinite; 
+}
+
+/* Layer constraints (tallest in back to shortest in front) */
+/* Colors are strictly structured in deep premium black shades */
+.wl-1  { height: 135%; left: 0%;    fill: #030304; }
+.wl-2  { height: 120%; left: -10vw; fill: #050507; }
+.wl-3  { height: 110%; left: -5vw;  fill: #07070a; }
+.wl-4  { height: 100%; left: -15vw; fill: #090a0d; }
+.wl-5  { height: 85%;  left: -2vw;  fill: #0c0d11; }
+.wl-6  { height: 70%;  left: -12vw; fill: #0e0f14; }
+.wl-7  { height: 55%;  left: -8vw;  fill: #111218; }
+.wl-8  { height: 40%;  left: -18vw; fill: #14151c; }
+.wl-9  { height: 25%;  left: -4vw;  fill: #171820; }
+.wl-10 { height: 10%;  left: -14vw; fill: #1a1c24; }
+
+@keyframes waveSlide {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ============================================================
+   EDUFLOW TEXT  –  centred, letter-wave entrance, shimmer
+   ============================================================ */
+.splash-logo {
+  position: relative;
+  z-index: 2;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(4rem, 13vw, 9rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  margin: 0;
+  display: flex;
+  padding-right: 0.1em; /* prevents letter 'W' clipping */
+
+  /* Premium metallic shimmer */
+  background: linear-gradient(
+    110deg,
+    #ffffff 0%,
+    #888888 30%,
+    #ffffff 55%,
+    #a6a6a6 75%,
+    #ffffff 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 0%   50%; }
+  100% { background-position: 250% 50%; }
+}
+
+/* ── Letter wave-rise entrance ── */
+.sl {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(50px) rotate(5deg);
+  animation: letterUp 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes letterUp {
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+}

@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  BookOpen,
+  CheckSquare,
+  Layers,
+  CalendarDays,
+  Clock,
+  Target,
+  Sun,
+  Cloud,
+  Moon,
+  Rocket,
+} from 'lucide-react';
 import './Dashboard.css';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -94,10 +106,12 @@ const Dashboard = () => {
 
   const getGreeting = () => {
     const h = new Date().getHours();
-    if (h < 12) return '☀️ Good Morning';
-    if (h < 17) return '🌤 Good Afternoon';
-    return '🌙 Good Evening';
+    if (h < 12) return { icon: <Sun size={22} />, text: 'Good Morning' };
+    if (h < 17) return { icon: <Cloud size={22} />, text: 'Good Afternoon' };
+    return { icon: <Moon size={22} />, text: 'Good Evening' };
   };
+
+  const greeting = getGreeting();
 
   const upcomingEvents = events
     .filter(e => new Date(e.date) >= new Date())
@@ -105,24 +119,28 @@ const Dashboard = () => {
     .slice(0, 4);
 
   const quickActions = [
-    { icon: '📚', label: 'My Subjects', path: '/subjects' },
-    { icon: '📝', label: 'Flashcards', path: '/flashcards' },
-    { icon: '📅', label: 'Planner', path: '/planner' },
-    { icon: '🎯', label: 'Workspace', path: '/workspace/general/unit1/topic1' },
+    { icon: <BookOpen size={22} />,   label: 'My Subjects', path: '/subjects' },
+    { icon: <Layers size={22} />,     label: 'Flashcards',  path: '/flashcards' },
+    { icon: <CalendarDays size={22} />,label: 'Planner',    path: '/planner' },
+    { icon: <Target size={22} />,     label: 'Workspace',   path: '/workspace/general/unit1/topic1' },
   ];
 
   return (
     <div className="dashboard">
       {/* Greeting */}
       <div className="dashboard-greeting">
-        <h1>{getGreeting()}, let's get studying! 🚀</h1>
+        <h1>
+          <span className="greeting-icon">{greeting.icon}</span>
+          {greeting.text}, let's get studying!&nbsp;
+          <span className="rocket-icon"><Rocket size={24} /></span>
+        </h1>
         <p>Here's your study overview for today</p>
       </div>
 
       <div className="dashboard-grid">
         {/* Stat Cards */}
         <div className="stat-card">
-          <div className="stat-icon purple">📚</div>
+          <div className="stat-icon purple"><BookOpen size={22} /></div>
           <div className="stat-info">
             <h3>{subjects.length}</h3>
             <p>Active Subjects</p>
@@ -130,7 +148,7 @@ const Dashboard = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon blue">✅</div>
+          <div className="stat-icon blue"><CheckSquare size={22} /></div>
           <div className="stat-info">
             <h3>{todos.filter(t => !t.done).length}</h3>
             <p>Pending Tasks</p>
@@ -138,7 +156,7 @@ const Dashboard = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon green">🃏</div>
+          <div className="stat-icon green"><Layers size={22} /></div>
           <div className="stat-info">
             <h3>{flashcards.length}</h3>
             <p>Flashcards</p>
@@ -166,13 +184,17 @@ const Dashboard = () => {
         <div className="dashboard-bottom">
           {/* Calendar */}
           <div className="calendar-card">
-            <h2 className="section-title">📅 Calendar</h2>
+            <h2 className="section-title">
+              <CalendarDays size={18} /> Calendar
+            </h2>
             <MiniCalendar events={events} />
           </div>
 
           {/* Upcoming Events */}
           <div className="upcoming-card">
-            <h2 className="section-title">⏰ Upcoming</h2>
+            <h2 className="section-title">
+              <Clock size={18} /> Upcoming
+            </h2>
             <div className="upcoming-list">
               {upcomingEvents.length === 0 && (
                 <p className="upcoming-empty">No upcoming events. Add some in the Planner!</p>

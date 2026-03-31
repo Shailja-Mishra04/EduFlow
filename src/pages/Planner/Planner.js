@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Planner.css';
+import { CalendarDays, Plus } from 'lucide-react';
 
 const MONTHS = ['January','February','March','April','May','June',
                 'July','August','September','October','November','December'];
@@ -82,11 +83,11 @@ const Planner = () => {
     <div className="planner-page">
       <div className="planner-header">
         <div>
-          <h1>📅 Planner</h1>
+          <h1><CalendarDays className="page-icon" /> Planner</h1>
           <p>Track your exams, deadlines and study sessions</p>
         </div>
         <button className="btn-primary" onClick={() => setShowForm(true)}>
-          + Add Event
+          <Plus size={18} /> Add Event
         </button>
       </div>
 
