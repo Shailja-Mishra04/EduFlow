@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BookOpen,
@@ -7,10 +7,8 @@ import {
   CalendarDays,
   Clock,
   Target,
-  Sun,
-  Cloud,
-  Moon,
-  Rocket,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import './Dashboard.css';
 
@@ -20,7 +18,9 @@ const MONTHS = ['January','February','March','April','May','June',
 
 const MiniCalendar = ({ events }) => {
   const today = new Date();
-  const [current, setCurrent] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+  const [current, setCurrent] = useState(
+    new Date(today.getFullYear(), today.getMonth(), 1)
+  );
 
   const year = current.getFullYear();
   const month = current.getMonth();
@@ -39,32 +39,52 @@ const MiniCalendar = ({ events }) => {
     cells.push({ day: cells.length - daysInMonth - firstDay + 1, current: false });
   }
 
-  const isToday = (day) =>
-    day.current &&
-    day.day === today.getDate() &&
+  const isToday = (cell) =>
+    cell.current &&
+    cell.day === today.getDate() &&
     month === today.getMonth() &&
     year === today.getFullYear();
 
-  const hasEvent = (day) =>
-    day.current &&
+  const hasEvent = (cell) =>
+    cell.current &&
     events.some(e => {
       const d = new Date(e.date);
-      return d.getDate() === day.day && d.getMonth() === month && d.getFullYear() === year;
+      return (
+        d.getDate() === cell.day &&
+        d.getMonth() === month &&
+        d.getFullYear() === year
+      );
     });
 
   return (
     <div className="mini-calendar">
       <div className="cal-header">
-        <button className="cal-nav" onClick={() => setCurrent(new Date(year, month - 1, 1))}>‹</button>
+        <button
+          className="cal-nav"
+          onClick={() => setCurrent(new Date(year, month - 1, 1))}
+        >
+          <ChevronLeft size={14} />
+        </button>
         <span>{MONTHS[month]} {year}</span>
-        <button className="cal-nav" onClick={() => setCurrent(new Date(year, month + 1, 1))}>›</button>
+        <button
+          className="cal-nav"
+          onClick={() => setCurrent(new Date(year, month + 1, 1))}
+        >
+          <ChevronRight size={14} />
+        </button>
       </div>
       <div className="cal-grid">
-        {DAYS.map(d => <div key={d} className="cal-day-name">{d}</div>)}
+        {DAYS.map(d => (
+          <div key={d} className="cal-day-name">{d}</div>
+        ))}
         {cells.map((cell, i) => (
           <div
             key={i}
-            className={`cal-day ${!cell.current ? 'other-month' : ''} ${isToday(cell) ? 'today' : ''} ${hasEvent(cell) ? 'has-event' : ''}`}
+            className={`cal-day
+              ${!cell.current ? 'other-month' : ''}
+              ${isToday(cell) ? 'today' : ''}
+              ${hasEvent(cell) ? 'has-event' : ''}
+            `}
           >
             {cell.day}
           </div>
@@ -76,7 +96,8 @@ const MiniCalendar = ({ events }) => {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [events, setEvents] = useState(() => {
+
+  const [events] = useState(() => {
     const saved = localStorage.getItem('eduflow-events');
     return saved ? JSON.parse(saved) : [
       { id: 1, title: 'Math Exam', date: new Date(Date.now() + 2 * 86400000).toISOString(), type: 'exam' },
@@ -100,18 +121,12 @@ const Dashboard = () => {
     return saved ? JSON.parse(saved) : [];
   });
 
-  useEffect(() => {
-    localStorage.setItem('eduflow-events', JSON.stringify(events));
-  }, [events]);
-
   const getGreeting = () => {
     const h = new Date().getHours();
-    if (h < 12) return { icon: <Sun size={22} />, text: 'Good Morning' };
-    if (h < 17) return { icon: <Cloud size={22} />, text: 'Good Afternoon' };
-    return { icon: <Moon size={22} />, text: 'Good Evening' };
+    if (h < 12) return 'Good Morning';
+    if (h < 17) return 'Good Afternoon';
+    return 'Good Evening';
   };
-
-  const greeting = getGreeting();
 
   const upcomingEvents = events
     .filter(e => new Date(e.date) >= new Date())
@@ -119,28 +134,25 @@ const Dashboard = () => {
     .slice(0, 4);
 
   const quickActions = [
-    { icon: <BookOpen size={22} />,   label: 'My Subjects', path: '/subjects' },
-    { icon: <Layers size={22} />,     label: 'Flashcards',  path: '/flashcards' },
-    { icon: <CalendarDays size={22} />,label: 'Planner',    path: '/planner' },
-    { icon: <Target size={22} />,     label: 'Workspace',   path: '/workspace/general/unit1/topic1' },
+    { icon: <BookOpen size={18} />,    label: 'My Subjects', path: '/subjects' },
+    { icon: <Layers size={18} />,      label: 'Flashcards',  path: '/flashcards' },
+    { icon: <CalendarDays size={18} />,label: 'Planner',     path: '/planner' },
+    { icon: <Target size={18} />,      label: 'Workspace',   path: '/workspace/general/unit1/topic1' },
   ];
 
   return (
     <div className="dashboard">
-      {/* Greeting */}
+      {/* Simplified Greeting: No emojis, no sub-tagline */}
       <div className="dashboard-greeting">
-        <h1>
-          <span className="greeting-icon">{greeting.icon}</span>
-          {greeting.text}, let's get studying!&nbsp;
-          <span className="rocket-icon"><Rocket size={24} /></span>
-        </h1>
-        <p>Here's your study overview for today</p>
+        <h1>{getGreeting()}</h1>
       </div>
 
       <div className="dashboard-grid">
-        {/* Stat Cards */}
+        {/* Stat cards */}
         <div className="stat-card">
-          <div className="stat-icon purple"><BookOpen size={22} /></div>
+          <div className="stat-icon">
+            <BookOpen size={20} strokeWidth={1.5} />
+          </div>
           <div className="stat-info">
             <h3>{subjects.length}</h3>
             <p>Active Subjects</p>
@@ -148,7 +160,9 @@ const Dashboard = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon blue"><CheckSquare size={22} /></div>
+          <div className="stat-icon">
+            <CheckSquare size={20} strokeWidth={1.5} />
+          </div>
           <div className="stat-info">
             <h3>{todos.filter(t => !t.done).length}</h3>
             <p>Pending Tasks</p>
@@ -156,14 +170,16 @@ const Dashboard = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon green"><Layers size={22} /></div>
+          <div className="stat-icon">
+            <Layers size={20} strokeWidth={1.5} />
+          </div>
           <div className="stat-info">
             <h3>{flashcards.length}</h3>
             <p>Flashcards</p>
           </div>
         </div>
 
-        {/* Quick Actions */}
+        {/* Quick actions */}
         <div className="quick-actions">
           <h2 className="section-title">Quick Actions</h2>
           <div className="actions-grid">
@@ -182,39 +198,38 @@ const Dashboard = () => {
 
         {/* Bottom row */}
         <div className="dashboard-bottom">
-          {/* Calendar */}
           <div className="calendar-card">
-            <h2 className="section-title">
-              <CalendarDays size={18} /> Calendar
-            </h2>
+            <h2 className="section-title">Calendar</h2>
             <MiniCalendar events={events} />
           </div>
 
-          {/* Upcoming Events */}
           <div className="upcoming-card">
-            <h2 className="section-title">
-              <Clock size={18} /> Upcoming
-            </h2>
+            <h2 className="section-title">Upcoming</h2>
             <div className="upcoming-list">
-              {upcomingEvents.length === 0 && (
-                <p className="upcoming-empty">No upcoming events. Add some in the Planner!</p>
+              {upcomingEvents.length === 0 ? (
+                <p className="upcoming-empty">No scheduled events.</p>
+              ) : (
+                upcomingEvents.map(event => {
+                  const d = new Date(event.date);
+                  return (
+                    <div key={event.id} className="upcoming-item">
+                      <div className="upcoming-date-badge">
+                        <span className="day">{d.getDate()}</span>
+                        <span className="month">
+                          {MONTHS[d.getMonth()].slice(0, 3)}
+                        </span>
+                      </div>
+                      <div className="upcoming-info">
+                        <h4>{event.title}</h4>
+                        <p>{d.toLocaleDateString('en-US', { weekday: 'short' })}</p>
+                      </div>
+                      <span className={`upcoming-tag ${event.type}`}>
+                        {event.type}
+                      </span>
+                    </div>
+                  );
+                })
               )}
-              {upcomingEvents.map(event => {
-                const d = new Date(event.date);
-                return (
-                  <div key={event.id} className="upcoming-item">
-                    <div className="upcoming-date-badge">
-                      <span className="day">{d.getDate()}</span>
-                      <span className="month">{MONTHS[d.getMonth()].slice(0, 3)}</span>
-                    </div>
-                    <div className="upcoming-info">
-                      <h4>{event.title}</h4>
-                      <p>{d.toLocaleDateString('en-US', { weekday: 'long' })}</p>
-                    </div>
-                    <span className={`upcoming-tag ${event.type}`}>{event.type}</span>
-                  </div>
-                );
-              })}
             </div>
           </div>
         </div>

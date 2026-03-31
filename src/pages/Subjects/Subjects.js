@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BookOpen, ChevronRight, Trash2, Plus, FileText } from 'lucide-react';
 import './Subjects.css';
-import { BookOpen } from 'lucide-react';
 
-const EMOJIS = ['📚','📖','✏️','🔬','🧪','🧬','🔭','🌍','📐','📏','🧮','💻','🎨','🎵','🏛️','⚗️','🧲','📊','📈','🗺️'];
-const COLORS = ['#ede9ff','#dbeafe','#dcfce7','#fef3c7','#fee2e2','#fce7f3','#e0f2fe','#f0fdf4'];
+const COLORS = [
+  '#2d2d2d','#c0392b','#2980b9','#27ae60',
+  '#8e44ad','#d35400','#16a085','#f39c12',
+];
 
-const slugify = (str) => str.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+const slugify = (str) =>
+  str.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
 const Subjects = () => {
   const navigate = useNavigate();
@@ -15,7 +18,7 @@ const Subjects = () => {
     return saved ? JSON.parse(saved) : [];
   });
   const [showModal, setShowModal] = useState(false);
-  const [newSubject, setNewSubject] = useState({ name: '', emoji: '📚', color: '#ede9ff' });
+  const [newSubject, setNewSubject] = useState({ name: '', color: '#2d2d2d' });
   const [expandedUnits, setExpandedUnits] = useState({});
   const [addingUnit, setAddingUnit] = useState(null);
   const [addingTopic, setAddingTopic] = useState(null);
@@ -28,137 +31,118 @@ const Subjects = () => {
 
   const addSubject = () => {
     if (!newSubject.name.trim()) return;
-    const subject = {
+    setSubjects([...subjects, {
       id: Date.now(),
       name: newSubject.name.trim(),
-      emoji: newSubject.emoji,
       color: newSubject.color,
       slug: slugify(newSubject.name.trim()),
       units: [],
-    };
-    setSubjects([...subjects, subject]);
-    setNewSubject({ name: '', emoji: '📚', color: '#ede9ff' });
+    }]);
+    setNewSubject({ name: '', color: '#2d2d2d' });
     setShowModal(false);
   };
 
-  const deleteSubject = (id) => {
+  const deleteSubject = (id) =>
     setSubjects(subjects.filter(s => s.id !== id));
-  };
 
   const addUnit = (subjectId) => {
     if (!unitInput.trim()) return;
-    const unit = {
-      id: Date.now(),
-      name: unitInput.trim(),
-      slug: slugify(unitInput.trim()),
-      topics: [],
-    };
     setSubjects(subjects.map(s =>
-      s.id === subjectId ? { ...s, units: [...s.units, unit] } : s
+      s.id === subjectId ? {
+        ...s, units: [...s.units, {
+          id: Date.now(),
+          name: unitInput.trim(),
+          slug: slugify(unitInput.trim()),
+          topics: [],
+        }]
+      } : s
     ));
     setUnitInput('');
     setAddingUnit(null);
   };
 
-  const deleteUnit = (subjectId, unitId) => {
+  const deleteUnit = (subjectId, unitId) =>
     setSubjects(subjects.map(s =>
       s.id === subjectId
         ? { ...s, units: s.units.filter(u => u.id !== unitId) }
         : s
     ));
-  };
 
   const addTopic = (subjectId, unitId) => {
     if (!topicInput.trim()) return;
-    const topic = {
-      id: Date.now(),
-      name: topicInput.trim(),
-      slug: slugify(topicInput.trim()),
-    };
     setSubjects(subjects.map(s =>
-      s.id === subjectId
-        ? {
-            ...s,
-            units: s.units.map(u =>
-              u.id === unitId
-                ? { ...u, topics: [...u.topics, topic] }
-                : u
-            ),
-          }
-        : s
+      s.id === subjectId ? {
+        ...s, units: s.units.map(u =>
+          u.id === unitId ? {
+            ...u, topics: [...u.topics, {
+              id: Date.now(),
+              name: topicInput.trim(),
+              slug: slugify(topicInput.trim()),
+            }]
+          } : u
+        )
+      } : s
     ));
     setTopicInput('');
     setAddingTopic(null);
   };
 
-  const deleteTopic = (subjectId, unitId, topicId) => {
+  const deleteTopic = (subjectId, unitId, topicId) =>
     setSubjects(subjects.map(s =>
-      s.id === subjectId
-        ? {
-            ...s,
-            units: s.units.map(u =>
-              u.id === unitId
-                ? { ...u, topics: u.topics.filter(t => t.id !== topicId) }
-                : u
-            ),
-          }
-        : s
+      s.id === subjectId ? {
+        ...s, units: s.units.map(u =>
+          u.id === unitId
+            ? { ...u, topics: u.topics.filter(t => t.id !== topicId) }
+            : u
+        )
+      } : s
     ));
-  };
 
-  const openWorkspace = (subject, unit, topic) => {
-    navigate(`/workspace/${subject.slug}/${unit.slug}/${topic.slug}`);
-  };
-
-  const toggleUnit = (key) => {
+  const toggleUnit = (key) =>
     setExpandedUnits(prev => ({ ...prev, [key]: !prev[key] }));
-  };
+
+  const openWorkspace = (subject, unit, topic) =>
+    navigate(`/workspace/${subject.slug}/${unit.slug}/${topic.slug}`);
 
   return (
     <div className="subjects-page">
       {/* Header */}
       <div className="subjects-header">
         <div>
-          <h1><BookOpen className="page-icon" /> My Subjects</h1>
+          <h1>
+            <BookOpen size={22} className="page-icon" />
+            My Subjects
+          </h1>
           <p>Organize your studies by subject, unit, and topic</p>
         </div>
-        <button
-          className="btn-primary"
-          onClick={() => setShowModal(true)}
-        >
-          + Add Subject
+        <button className="btn-primary" onClick={() => setShowModal(true)}>
+          <Plus size={16} /> Add Subject
         </button>
       </div>
 
       {/* Empty state */}
       {subjects.length === 0 && (
         <div className="subjects-empty">
-          <div className="empty-icon">📭</div>
+          <div className="empty-icon">
+            <BookOpen size={48} />
+          </div>
           <h2>No subjects yet</h2>
-          <p>Add your first subject to get started</p>
-          <button
-            className="btn-primary"
-            style={{ margin: '0 auto' }}
-            onClick={() => setShowModal(true)}
-          >
-            + Add Subject
-          </button>
+          <p>Click "Add Subject" above to get started</p>
         </div>
       )}
 
-      {/* Subjects grid */}
+      {/* Notebook grid */}
       <div className="subjects-grid">
         {subjects.map(subject => (
           <div key={subject.id} className="subject-card">
+            {/* Card header */}
             <div className="subject-card-header">
               <div className="subject-card-left">
                 <div
-                  className="subject-emoji"
+                  className="subject-color-tab"
                   style={{ background: subject.color }}
-                >
-                  {subject.emoji}
-                </div>
-                <div>
+                />
+                <div className="subject-info">
                   <div className="subject-name">{subject.name}</div>
                   <div className="subject-meta">
                     {subject.units.length} units ·{' '}
@@ -171,11 +155,12 @@ const Subjects = () => {
                   className="btn-danger"
                   onClick={() => deleteSubject(subject.id)}
                 >
-                  🗑
+                  <Trash2 size={14} />
                 </button>
               </div>
             </div>
 
+            {/* Units */}
             <div className="subject-units">
               <div className="units-label">Units</div>
 
@@ -184,12 +169,11 @@ const Subjects = () => {
                 const isOpen = expandedUnits[key];
                 return (
                   <div key={unit.id} className="unit-row">
-                    <div
-                      className="unit-header"
-                      onClick={() => toggleUnit(key)}
-                    >
+                    <div className="unit-header" onClick={() => toggleUnit(key)}>
                       <div className="unit-header-left">
-                        <span className={`unit-toggle ${isOpen ? 'open' : ''}`}>▶</span>
+                        <span className={`unit-toggle ${isOpen ? 'open' : ''}`}>
+                          <ChevronRight size={14} />
+                        </span>
                         {unit.name}
                       </div>
                       <div
@@ -198,7 +182,7 @@ const Subjects = () => {
                       >
                         <button
                           className="btn-secondary"
-                          style={{ fontSize: '11px', padding: '3px 8px' }}
+                          style={{ fontSize: '11px', padding: '2px 8px' }}
                           onClick={() => setAddingTopic(key)}
                         >
                           + Topic
@@ -207,7 +191,7 @@ const Subjects = () => {
                           className="btn-danger"
                           onClick={() => deleteUnit(subject.id, unit.id)}
                         >
-                          🗑
+                          <Trash2 size={12} />
                         </button>
                       </div>
                     </div>
@@ -215,7 +199,7 @@ const Subjects = () => {
                     {isOpen && (
                       <div className="topics-list">
                         {unit.topics.length === 0 && (
-                          <div style={{ fontSize: '12px', color: 'var(--text-muted)', padding: '6px 10px' }}>
+                          <div style={{ fontSize: '12px', color: 'var(--text-faint)', padding: '6px 8px' }}>
                             No topics yet
                           </div>
                         )}
@@ -225,7 +209,7 @@ const Subjects = () => {
                               className="topic-row-left"
                               onClick={() => openWorkspace(subject, unit, topic)}
                             >
-                              <span className="topic-dot" />
+                              <FileText size={12} style={{ color: 'var(--text-faint)', flexShrink: 0 }} />
                               {topic.name}
                             </div>
                             <div className="topic-actions">
@@ -233,7 +217,7 @@ const Subjects = () => {
                                 className="btn-danger"
                                 onClick={() => deleteTopic(subject.id, unit.id, topic.id)}
                               >
-                                🗑
+                                <Trash2 size={12} />
                               </button>
                             </div>
                           </div>
@@ -250,7 +234,7 @@ const Subjects = () => {
                             />
                             <button
                               className="btn-primary"
-                              style={{ padding: '6px 10px', fontSize: '12px' }}
+                              style={{ padding: '5px 10px', fontSize: '12px' }}
                               onClick={() => addTopic(subject.id, unit.id)}
                             >
                               Add
@@ -281,7 +265,7 @@ const Subjects = () => {
                   />
                   <button
                     className="btn-primary"
-                    style={{ padding: '8px 12px', fontSize: '12px' }}
+                    style={{ padding: '7px 12px', fontSize: '12px' }}
                     onClick={() => addUnit(subject.id)}
                   >
                     Add
@@ -311,7 +295,8 @@ const Subjects = () => {
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
-            <h2>Add New Subject</h2>
+            <h2>New Subject</h2>
+
             <div className="modal-field">
               <label>Subject Name</label>
               <input
@@ -322,22 +307,9 @@ const Subjects = () => {
                 autoFocus
               />
             </div>
+
             <div className="modal-field">
-              <label>Pick an Icon</label>
-              <div className="emoji-grid">
-                {EMOJIS.map(em => (
-                  <div
-                    key={em}
-                    className={`emoji-option ${newSubject.emoji === em ? 'selected' : ''}`}
-                    onClick={() => setNewSubject({ ...newSubject, emoji: em })}
-                  >
-                    {em}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="modal-field">
-              <label>Card Color</label>
+              <label>Spine Color</label>
               <div className="color-grid">
                 {COLORS.map(c => (
                   <div
@@ -349,15 +321,13 @@ const Subjects = () => {
                 ))}
               </div>
             </div>
+
             <div className="modal-actions">
-              <button
-                className="btn-secondary"
-                onClick={() => setShowModal(false)}
-              >
+              <button className="btn-secondary" onClick={() => setShowModal(false)}>
                 Cancel
               </button>
               <button className="btn-primary" onClick={addSubject}>
-                Add Subject
+                Create Subject
               </button>
             </div>
           </div>

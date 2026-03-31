@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { CheckSquare, X, Plus, Minus } from 'lucide-react'; // Minimalist icons
 import './TodoList.css';
 
 const TodoList = () => {
@@ -18,6 +19,7 @@ const TodoList = () => {
   }, [tasks]);
 
   const onMouseDown = (e) => {
+    if (e.target.closest('.todo-close')) return; // Don't drag when clicking close
     dragging.current = true;
     offset.current = {
       x: e.clientX - position.x,
@@ -62,7 +64,7 @@ const TodoList = () => {
         style={{ left: position.x, top: position.y }}
         onClick={() => setVisible(true)}
       >
-        <span>📝</span>
+        <CheckSquare size={18} strokeWidth={2} />
         <span className="todo-float-count">{tasks.filter(t => !t.done).length}</span>
       </div>
     );
@@ -75,8 +77,10 @@ const TodoList = () => {
       style={{ left: position.x, top: position.y }}
     >
       <div className="todo-header" onMouseDown={onMouseDown}>
-        <span className="todo-title">📝 To-Do</span>
-        <button className="todo-close" onClick={() => setVisible(false)}>−</button>
+        <span className="todo-title">Tasks</span>
+        <button className="todo-close" onClick={() => setVisible(false)}>
+          <Minus size={18} />
+        </button>
       </div>
       <div className="todo-input-row">
         <input
@@ -84,23 +88,28 @@ const TodoList = () => {
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && addTask()}
-          placeholder="Add a task..."
+          placeholder="New task..."
         />
-        <button className="todo-add-btn" onClick={addTask}>+</button>
+        <button className="todo-add-btn" onClick={addTask}>
+          <Plus size={16} />
+        </button>
       </div>
       <div className="todo-list">
         {tasks.length === 0 && (
-          <p className="todo-empty">No tasks yet. Add one above!</p>
+          <p className="todo-empty">All caught up.</p>
         )}
         {tasks.map(task => (
           <div key={task.id} className={`todo-item ${task.done ? 'done' : ''}`}>
             <input
               type="checkbox"
+              className="todo-checkbox"
               checked={task.done}
               onChange={() => toggleTask(task.id)}
             />
             <span className="todo-text">{task.text}</span>
-            <button className="todo-delete" onClick={() => deleteTask(task.id)}>×</button>
+            <button className="todo-delete" onClick={() => deleteTask(task.id)}>
+              <X size={14} />
+            </button>
           </div>
         ))}
       </div>

@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* Import both font families */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&display=swap');
 
 * {
   margin: 0;
@@ -6,49 +7,94 @@
   box-sizing: border-box;
 }
 
-/* THEME VARIABLES */
 :root {
   --sidebar-width: 250px;
   --sidebar-collapsed-width: 60px;
-  --primary: #6c63ff;
-  --primary-light: #ede9ff;
-  
-  /* Light Mode Colors */
-  --bg: #f7f7f8;
-  --white: #ffffff;
-  --text: #1a1a2e;
-  --text-muted: #6b7280;
-  --border: #e5e7eb;
-  --shadow: 0 1px 3px rgba(0,0,0,0.08);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-  --radius: 10px;
-  --radius-sm: 6px;
+
+  /* Your existing color variables */
+  --bg: #f0ede8;
+  --white: #f7f4ef;
+  --card: #faf8f5;
+  --card-hover: #ffffff;
+  --text: #1c1c1e;
+  --text-muted: #6b6b6b;
+  --text-faint: #a0a0a0;
+  --border: #ddd9d3;
+  --border-light: #e8e4de;
+  --primary: #2d2d2d;
+  --primary-light: #e8e4de;
+  --primary-hover: #1a1a1a;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --radius: 12px;
+  --radius-sm: 7px;
+  --green: #22c55e;
+  --red: #ef4444;
+  --yellow: #f59e0b;
+  --blue: #3b82f6;
 }
 
-/* DARK MODE OVERRIDES */
 body.dark-mode {
-  --bg: #121212;
-  --white: #1e1e1e;
-  --text: #f5f5f5;
-  --text-muted: #a0a0a0;
-  --border: #333333;
-  --primary-light: #2d2b55;
-  --shadow: 0 1px 3px rgba(0,0,0,0.3);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+  --bg: #141414;
+  --white: #1c1c1e;
+  --card: #242424;
+  --card-hover: #2a2a2a;
+  --text: #f0ede8;
+  --text-muted: #9a9a9a;
+  --text-faint: #555555;
+  --border: #2e2e2e;
+  --border-light: #282828;
+  --primary: #e8e4de;
+  --primary-light: #2a2a2a;
+  --primary-hover: #ffffff;
 }
 
+/* ── Global Typography DNA ── */
 body {
-  font-family: 'Inter', sans-serif;
+  /* Set Inter as the base UI font */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--bg);
   color: var(--text);
-  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* ── Headings (The Planner Look) ── */
+h1, h2, h3, .dashboard-greeting h1, .section-title {
+  font-family: 'DM Serif Display', serif;
+  font-weight: 400; /* Serif Display looks best at 400 weight */
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+/* ── UI Elements (The Inter Look) ── */
+button, 
+input, 
+select, 
+textarea, 
+.action-label, 
+.stat-info p, 
+.upcoming-info h4 {
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* Specialized logic for your minimalist text styles */
+.section-title {
+  /* Keep the uppercase style for smaller labels, but use Inter for clarity */
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ── Main Layout ── */
 .app-container {
   display: flex;
   height: 100vh;
-  overflow: hidden;
 }
 
 .main-content {
@@ -56,35 +102,5 @@ body {
   overflow-y: auto;
   margin-left: var(--sidebar-width);
   transition: margin-left 0.3s ease;
-  height: 100vh;
-}
-
-.main-content.sidebar-collapsed {
-  margin-left: var(--sidebar-collapsed-width);
-}
-
-/* ============================================================
-   FORCE VISIBILITY FIX
-   Ensures buttons never hide unless hovered
-   ============================================================ */
-[class*="btn-"], 
-.subject-card-actions, 
-.topic-actions, 
-.unit-actions {
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: flex !important;
-  transform: none !important;
-}
-
-[class*="btn-"]:hover {
-  transform: translateY(-1px) !important;
-  cursor: pointer !important;
-}
-
-/* Ensure consistent button text color in dark mode */
-body.dark-mode .btn-secondary {
-  background: transparent;
-  border-color: var(--border);
-  color: var(--text);
+  background: var(--bg);
 }
