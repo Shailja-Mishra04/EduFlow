@@ -5,7 +5,6 @@ import {
   CheckSquare,
   Layers,
   CalendarDays,
-  Clock,
   Target,
   ChevronLeft,
   ChevronRight,
